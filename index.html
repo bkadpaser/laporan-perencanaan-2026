@@ -3,27 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quick Links Hub</title>
+  <title>Drive Document Inspector</title>
   <style>
     :root {
       --bg-color: #0f172a;
       --card-bg: #1e293b;
-      --accent-blue: #3b82f6;
-      --accent-blue-hover: #2563eb;
-      --accent-purple: #8b5cf6;
-      --accent-purple-hover: #7c3aed;
-      --accent-emerald: #10b981;
-      --accent-emerald-hover: #059669;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --border: #334155;
+      --status-green: #22c55e;
+      --status-red: #ef4444;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -34,155 +28,246 @@
       padding: 40px 20px;
     }
 
-    /* Animated Gradient Banner */
-    .banner {
-      width: 100%;
-      padding: 28px 20px;
-      border-radius: 12px;
-      text-align: center;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-      background-size: 400% 400%;
-      animation: gradientBG 10s ease infinite;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-      margin-bottom: 32px;
-    }
-
-    .banner h1 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .banner p {
-      font-size: 0.95rem;
-      color: rgba(255, 255, 255, 0.9);
-      margin-top: 6px;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Container for rows */
-    .rows-container {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .row-card {
+    .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      padding: 24px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      margin-bottom: 24px;
     }
 
-    .row-card h2 {
-      font-size: 1.2rem;
+    h2 { font-size: 1.3rem; margin-bottom: 16px; color: var(--text); }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    label { font-size: 0.875rem; color: var(--text-muted); font-weight: 600; }
+
+    input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       color: var(--text);
-      margin-bottom: 14px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
     }
 
-    .button-group {
+    .folder-buttons {
       display: flex;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .btn {
+    .folder-btn {
       flex: 1;
+      min-width: 180px;
       padding: 12px 16px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
       border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .folder-btn:hover { background-color: var(--accent-hover); }
+
+    /* Results List */
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+
+    .file-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow: hidden;
+    }
+
+    .file-link {
+      color: var(--text);
       text-decoration: none;
       font-weight: 600;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-link:hover { text-decoration: underline; color: var(--accent); }
+
+    .file-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Status Box Indicator */
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .status-badge.before {
+      background-color: rgba(34, 197, 94, 0.15);
+      color: var(--status-green);
+      border: 1px solid var(--status-green);
+    }
+
+    .status-badge.after {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: var(--status-red);
+      border: 1px solid var(--status-red);
+    }
+
+    .box-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .box-indicator.green { background-color: var(--status-green); }
+    .box-indicator.red { background-color: var(--status-red); }
+
+    .message-text {
+      color: var(--text-muted);
       font-size: 0.9rem;
       text-align: center;
-      transition: all 0.2s ease-in-out;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-    }
-
-    /* Row Specific Button Styling */
-    .row-1 .btn {
-      background-color: var(--accent-blue);
-    }
-    .row-1 .btn:hover {
-      background-color: var(--accent-blue-hover);
-      transform: translateY(-2px);
-    }
-
-    .row-2 .btn {
-      background-color: var(--accent-purple);
-    }
-    .row-2 .btn:hover {
-      background-color: var(--accent-purple-hover);
-      transform: translateY(-2px);
-    }
-
-    .row-3 .btn {
-      background-color: var(--accent-emerald);
-    }
-    .row-3 .btn:hover {
-      background-color: var(--accent-emerald-hover);
-      transform: translateY(-2px);
-    }
-
-    /* Mobile Responsiveness */
-    @media (max-width: 600px) {
-      .button-group {
-        flex-direction: column;
-      }
+      padding: 20px 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- Animated Center Banner -->
-  <div class="banner">
-    <h1>Quick Navigation Hub</h1>
-    <p>Select a destination from the categories below</p>
+  <!-- Controls Card -->
+  <div class="card">
+    <h2>1. Target Upload Cutoff Date</h2>
+    <div class="controls">
+      <label for="cutoffDate">Cutoff Date (Uploaded on or before this date = Green)</label>
+      <input type="date" id="cutoffDate" value="2026-02-01" />
+    </div>
+
+    <h2>2. Select Folder to Inspect</h2>
+    <div class="folder-buttons">
+      <!-- Replace data-folder-id with your actual Google Drive Folder IDs -->
+      <button class="folder-btn" data-folder-id="1BMRLKDam1FfVW1a5GJuZqQfw_rHvrpAj" onclick="fetchDriveFiles(this)">
+        📁 Folder A
+      </button>
+      <button class="folder-btn" data-folder-id="1VmSfvfnU2U6o8t1Q6x-MRgbfLO92pSGj" onclick="fetchDriveFiles(this)">
+        📁 Folder B
+      </button>
+      <button class="folder-btn" data-folder-id="1KU1AKrk6E4R6fQcJBHd_yYUxCeuhqjBJ" onclick="fetchDriveFiles(this)">
+        📁 Folder C
+      </button>
+    </div>
   </div>
 
-  <div class="rows-container">
-    
-    <!-- Row 1 -->
-    <div class="row-card row-1">
-      <h2>Media & Tools</h2>
-      <div class="button-group">
-        <a href="https://github.com" target="_blank" rel="noopener" class="btn">GitHub</a>
-        <a href="https://youtube.com" target="_blank" rel="noopener" class="btn">YouTube</a>
-        <a href="https://cobalt.tools" target="_blank" rel="noopener" class="btn">Cobalt Tools</a>
-      </div>
+  <!-- Results Card -->
+  <div class="card">
+    <h2>Folder Files</h2>
+    <div id="fileContainer" class="file-list">
+      <div class="message-text">Select a folder button above to retrieve files.</div>
     </div>
-
-    <!-- Row 2 -->
-    <div class="row-card row-2">
-      <h2>Developer Resources</h2>
-      <div class="button-group">
-        <a href="https://developer.mozilla.org" target="_blank" rel="noopener" class="btn">MDN Docs</a>
-        <a href="https://stackoverflow.com" target="_blank" rel="noopener" class="btn">Stack Overflow</a>
-        <a href="https://cdnjs.com" target="_blank" rel="noopener" class="btn">cdnjs</a>
-      </div>
-    </div>
-
-    <!-- Row 3 -->
-    <div class="row-card row-3">
-      <h2>Utilities & Search</h2>
-      <div class="button-group">
-        <a href="https://google.com" target="_blank" rel="noopener" class="btn">Google</a>
-        <a href="https://duckduckgo.com" target="_blank" rel="noopener" class="btn">DuckDuckGo</a>
-        <a href="https://archive.org" target="_blank" rel="noopener" class="btn">Internet Archive</a>
-      </div>
-    </div>
-
   </div>
+
+  <script>
+    // Paste your deployed Google Apps Script Web App URL here
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGIA_8arvuvXSypEDclmfr5AKf2Sh221ZsUiYhrWE8LcNEvm1ygEpenfoMWmukbsdu/exec";
+
+    async function fetchDriveFiles(btnElement) {
+      const folderId = btnElement.getAttribute('data-folder-id');
+      const container = document.getElementById('fileContainer');
+      const cutoffDateVal = document.getElementById('cutoffDate').value;
+
+      if (!cutoffDateVal) {
+        alert("Please set a valid cutoff date first.");
+        return;
+      }
+
+      const targetCutoff = new Date(cutoffDateVal);
+      // Set target to end of that selected day (23:59:59)
+      targetCutoff.setHours(23, 59, 59, 999);
+
+      container.innerHTML = '<div class="message-text">Fetching files from Google Drive...</div>';
+
+      try {
+        const response = await fetch(`${APPS_SCRIPT_URL}?folderId=${encodeURIComponent(folderId)}`);
+        const data = await response.json();
+
+        if (data.error) {
+          container.innerHTML = `<div class="message-text" style="color:var(--status-red)">Error: ${data.error}</div>`;
+          return;
+        }
+
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = '<div class="message-text">No files found in this folder.</div>';
+          return;
+        }
+
+        container.innerHTML = data.map(file => {
+          const fileCreatedDate = new Date(file.created);
+          const isBeforeCutoff = fileCreatedDate <= targetCutoff;
+
+          const formattedDate = fileCreatedDate.toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+
+          return `
+            <div class="file-item">
+              <div class="file-info">
+                <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="file-link" title="Open in Google Drive">
+                  📄 ${escapeHtml(file.name)}
+                </a>
+                <span class="file-date">Uploaded: ${formattedDate}</span>
+              </div>
+              <div class="status-badge ${isBeforeCutoff ? 'before' : 'after'}">
+                <span class="box-indicator ${isBeforeCutoff ? 'green' : 'red'}"></span>
+                <span>${isBeforeCutoff ? 'Before Date' : 'Past Date'}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        container.innerHTML = `<div class="message-text" style="color:var(--status-red)">Failed to fetch files. Check console or CORS setup.</div>`;
+        console.error(err);
+      }
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+  </script>
 
 </body>
 </html>
